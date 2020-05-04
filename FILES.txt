@@ -1,0 +1,11 @@
+conf-chain-00.dat
+conf-chain-05.dat
+conf-chain-10.dat
+conf-chain-20.dat
+conf-chain-50.dat
+conf-ring-00.dat
+conf-ring-05.dat
+conf-ring-10.dat
+conf-ring-20.dat
+conf-ring-50.dat
+conf-star-00.dat

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VisualStudioProject ProjectCreator="Intel Fortran" Keyword="Console Application" Version="11.0" ProjectIdGuid="{6A7FAE3D-E736-4EEC-8DEE-97A367FACB52}">
+	<Platforms>
+		<Platform Name="Win32"/></Platforms>
+	<Configurations>
+		<Configuration Name="Debug|Win32">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" WarnInterfaces="true" Traceback="true" BoundsCheck="true" StackFrameCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL" UseMkl="mklParallel"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" GenerateDebugInformation="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
+		<Configuration Name="Release|Win32">
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" RuntimeLibrary="rtMultiThreadedDLL"/>
+				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
+				<Tool Name="VFResourceCompilerTool"/>
+				<Tool Name="VFMidlTool" SuppressStartupBanner="true"/>
+				<Tool Name="VFCustomBuildTool"/>
+				<Tool Name="VFPreLinkEventTool"/>
+				<Tool Name="VFPreBuildEventTool"/>
+				<Tool Name="VFPostBuildEventTool"/>
+				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration></Configurations>
+	<Files>
+		<Filter Name="Header Files" Filter="fi;fd"/>
+		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+		<File RelativePath=".\conf-chain-00.dat"/>
+		<File RelativePath=".\conf-chain-05.dat"/>
+		<File RelativePath=".\conf-chain-10.dat"/>
+		<File RelativePath=".\conf-chain-20.dat"/>
+		<File RelativePath=".\conf-chain-50.dat"/>
+		<File RelativePath=".\conf-ring-00.dat"/>
+		<File RelativePath=".\conf-ring-05.dat"/>
+		<File RelativePath=".\conf-ring-10.dat"/>
+		<File RelativePath=".\conf-ring-20.dat"/>
+		<File RelativePath=".\conf-ring-50.dat"/>
+		<File RelativePath=".\conf-star-00.dat"/>
+		<File RelativePath=".\dataconf-chain-00.txt"/>
+		<File RelativePath=".\dataconf-chain-05.txt"/>
+		<File RelativePath=".\dataconf-chain-10.txt"/>
+		<File RelativePath=".\dataconf-chain-20.txt"/>
+		<File RelativePath=".\dataconf-chain-50.txt"/>
+		<File RelativePath=".\dataconf-ring-00.txt"/>
+		<File RelativePath=".\dataconf-ring-05.txt"/>
+		<File RelativePath=".\dataconf-ring-10.txt"/>
+		<File RelativePath=".\dataconf-ring-20.txt"/>
+		<File RelativePath=".\dataconf-ring-50.txt"/>
+		<File RelativePath=".\dataconf-star-00.txt"/>
+		<File RelativePath=".\FILES.txt"/>
+		<File RelativePath="C:\Users\Laurenz\Downloads\gyration.f95"/></Filter>
+		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
+		<File RelativePath=".\GyrationTensorPolymers.f90"/>
+		<File RelativePath="..\Poison Equation\LinearSystems.f90"/></Filter>
+		<File RelativePath=".\ReadMe.txt"/></Files>
+	<Globals/></VisualStudioProject>
