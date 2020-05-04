@@ -48,8 +48,7 @@
 		<File RelativePath=".\dataconf-ring-20.txt"/>
 		<File RelativePath=".\dataconf-ring-50.txt"/>
 		<File RelativePath=".\dataconf-star-00.txt"/>
-		<File RelativePath=".\FILES.txt"/>
-		<File RelativePath="C:\Users\Laurenz\Downloads\gyration.f95"/></Filter>
+		<File RelativePath=".\FILES.txt"/></Filter>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<File RelativePath=".\GyrationTensorPolymers.f90"/>
 		<File RelativePath="..\Poison Equation\LinearSystems.f90"/></Filter>
