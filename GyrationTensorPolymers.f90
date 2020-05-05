@@ -20,7 +20,7 @@
 
     INTEGER :: i,j, k
     INTEGER, PARAMETER :: m=100, n=100 ! 2501
-    DOUBLE PRECISION :: rg,rg_pos,asphericity,prolateness
+    
     DOUBLE PRECISION :: rg_av, rg_pos_av, asphericity_av, prolateness_av
     DOUBLE PRECISION :: lambda1,lambda2,lambda3
     CHARACTER(2) :: ncstring
@@ -49,13 +49,19 @@
     double precision, dimension(3,3) :: vl, vr
     integer :: info
     
+    !Sortierte EG und berechnung der physikalischen Größen
+    double precision, dimension(3) :: eigenwert_sort
+    DOUBLE PRECISION :: rg,rg_pos,asphericity,prolateness
+    
+    
     einheit =  reshape(valI, [3,3])
     ! Speichern der Namen der .dat Dateien in FILES.txt
     call system('DIR *.DAT /B > FILES.txt') !Windows
     !call system('ls -l *.dat./inFiles > FILES.txt') !Linux
 
     open(unit= 11,file="FILES.txt",action="read")
-
+    open(unit =14, file="Average.txt", action="write")
+    open(unit=15, file="Eigenvalues.txt", action="write")
     do
         read(11,*, iostat=stat) filename
         filename = trim(filename)
@@ -91,7 +97,10 @@
                 read(12, *) position(j,1), position(j,2), position(j,3)
                 schwerpunkt = schwerpunkt + position(j,1:3)
             end do
+            
+            
             schwerpunkt = schwerpunkt / dble(num)
+            rg_pos = 0d0
             do j = 1, num
                 sxx = sxx + (position(j,1) - schwerpunkt(1))**2
                 syy = syy + (position(j,2) - schwerpunkt(2))**2
@@ -99,7 +108,10 @@
                 sxy = sxy + (position(j,1) - schwerpunkt(1))*(position(j,2) - schwerpunkt(2))
                 sxz = sxz + (position(j,1) - schwerpunkt(1))*(position(j,3) - schwerpunkt(3))
                 syz = syz + (position(j,2) - schwerpunkt(2))*(position(j,3) - schwerpunkt(3))
+                rg_pos = rg_pos +  sum((position(j, 1:3) - schwerpunkt(1:3))**2)
             end do
+            rg_pos = sqrt(rg_pos / dble(num))
+            
             gyrationTensor(1,1:3) = [sxx, sxy, sxz]
             gyrationTensor(2,1:3) = [sxy, syy, syz]
             gyrationTensor(3,1:3) = [sxz, syz, szz]
@@ -125,79 +137,56 @@
             do k= 1, 3
                 eigenwert(k) = gyrationTensor(k,k)
             end do
-            print*, eigenwert
-            print*, wr
-            exit
-           ! write(13,*) lambda1, lambda2, lambda3
+           write(15, '(A,1x,A,1x,I3, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x)') form, stiffness, i, eigenwert(1), eigenwert(2), eigenwert(3), wr(1), wr(2), wr(3)
+            !Sortieren der Eigenwerte
+            eigenwert_sort(1) = MINVAL(wr)
+            wr(MINLOC(wr)) = MAXVAL(wr) + 1d0
+            eigenwert_sort(2) = MINVAL(wr)
+            wr(MINLOC(wr)) = MAXVAL(wr) + 1d0
+            eigenwert_sort(3) = MINVAL(wr)
             
             
+            wr = 0d0
             
+           
+            rg = sum(eigenwert_sort)
             
+            asphericity = eigenwert_sort(3) - 1d0/2d0 * (eigenwert_sort(1) + eigenwert_sort(2))
             
-            !u1 = gyrationTensor(1:3, 1) - (gyrationTensor(1, 1)/abs(gyrationTensor(1, 1))) *  sqrt(sum(gyrationTensor(1:3, 1)**2)) * einheit(1:3,1)
-            !
-            !
-            !H1(1,1:3) = einheit(1,1:3) - 2d0* (u1(1) * u1(1:3))   / sum(u1**2)
-            !H1(2,1:3) = einheit(2,1:3) - 2d0* (u1(2) * u1(1:3))   / sum(u1**2)
-            !H1(3,1:3) = einheit(3,1:3) - 2d0* (u1(3) * u1(1:3))   / sum(u1**2)
-            !
-            !gyrationTensor = matmul(H1, gyrationTensor)
-            !!
-            !
-            !
-            !u2 = gyrationTensor(2:3, 2) + gyrationTensor(2, 2)/abs(gyrationTensor(2, 2)) *  sqrt(sum(gyrationTensor(2:3, 2)**2)) * einheit(2:3,2)
-            !
-            !H2(1,1:3) = einheit(1,1:3)
-            !H2(2:3,1) = 0d0
-            !H2(2,2:3) = einheit(2,2:3) - 2* (u2(1) * u2(1:2))/ sum(u2**2)
-            !H2(3,2:3) = einheit(3,2:3) - 2* (u2(2) * u2(1:2))/ sum(u2**2)
-            !!call showMatrix(gyrationTensor, "Gyration Tensor 1. Step Houshold")
-            !!call showMatrix(H2, "H2")
-            !gyrationTensor = matmul(H2, gyrationTensor)
-            !!call showMatrix(gyrationTensor, "Gyration Tensor 2. Step Houshold")
-            !
-            !!Find out Q for test
-            !Q = matmul(H1,H2)
-            !!exit
-            !if (.not. (abs(gyrationTensor(2,1)) < 1d-8 .and. abs(gyrationTensor(3,1)) <1d-8 .and. abs(gyrationTensor(3,2)) < 1d-8)) then
-            !    print*,"Fehler! Gyrationstensor nicht triagonal nach QR-Zerlegung"
-            !    call showMatrix(gyrationTensor, "Fehlerhafte Triagonale Matrix")
-            !    exit
-            !end if
-            !print*, "u1", u1
-            !print*, "u2", u2
-            !call showMatrix(Q, "Q Matrix")
-            !call showMatrix(H1, "H1 Matrix")
-            !call showMatrix(H2, "H2 Matrix")
-            !call showMatrix(gyrationTensorLAPACK, "Gyration")
-            !call showMatrix(gyrationTensor,"R Matrix")
-            !A = matmul(Q,gyrationTensor)
-            !call dgeev('N','N',3, gyrationTensorLAPACK, 3,wr,wi,vl,3,vr,3, lwork,12,info)
-            !call showMatrix(A, "A")
+            prolateness = ((3 * eigenwert_sort(1) - rg)*(3*eigenwert_sort(2) - rg)*( 3*eigenwert_sort(3) - rg))/ rg**3
             
-            !
-            !print*, wr
-            !print*, info
-            !print*, lambda1, lambda2, lambda3
-            !exit
-            !
+            rg = sqrt(rg)
             
-            
-            
-            
-            
-            
-            
+            write(13,'(I3,1x, F16.6, 1x,F16.6, 1x,F16.6,1x, F16.6, 1x,F16.6,1x, F16.6,1x, F16.6)') i, rg,rg_pos, asphericity, prolateness, eigenwert_sort(1), eigenwert_sort(2),eigenwert_sort(3) 
         end do
         close(12)
-
+        close(13)
         deallocate(position)
-
-    end do
-
+        
+        OPEN(33,file=trim("data" // filename(1:length-3) // "txt"),status='old', action="read")
+        rg_av=0.d0
+        rg_pos_av=0.d0
+        asphericity_av=0.d0
+        prolateness_av=0.d0
+        DO j=1,conf
+            READ(33,*)i,rg,rg_pos,asphericity,prolateness,lambda1,lambda2,lambda3
+            rg_av=rg_av+rg
+            rg_pos_av=rg_pos_av+rg_pos
+            asphericity_av=asphericity_av+asphericity
+            prolateness_av=prolateness_av+prolateness
+        END DO
+        CLOSE(33)
+        rg_av=rg_av/dble(num)
+        rg_pos_av=rg_pos_av/dble(num)
+        asphericity_av=asphericity_av/dble(num)
+        prolateness_av=prolateness_av/dble(num)
+        write(14, '(A, 1x, A, 1x, F16.6, 1x, F16.6, 1x, F16.6, 1x, F16.6)') form, stiffness, rg_av, rg_pos_av, asphericity_av, prolateness_av
+        
+        
+    end do    
     close(11)
-
-
+    close(14)
+    close(15)
 
 
     !! Store the data for each configuration j

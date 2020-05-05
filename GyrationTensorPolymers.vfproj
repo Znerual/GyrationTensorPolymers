@@ -26,6 +26,7 @@
 	<Files>
 		<Filter Name="Header Files" Filter="fi;fd"/>
 		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+		<File RelativePath=".\Average.txt"/>
 		<File RelativePath=".\conf-chain-00.dat"/>
 		<File RelativePath=".\conf-chain-05.dat"/>
 		<File RelativePath=".\conf-chain-10.dat"/>
@@ -48,6 +49,7 @@
 		<File RelativePath=".\dataconf-ring-20.txt"/>
 		<File RelativePath=".\dataconf-ring-50.txt"/>
 		<File RelativePath=".\dataconf-star-00.txt"/>
+		<File RelativePath=".\Eigenvalues.txt"/>
 		<File RelativePath=".\FILES.txt"/></Filter>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<File RelativePath=".\GyrationTensorPolymers.f90"/>
