@@ -10,11 +10,17 @@
     !
     !  PURPOSE:  Entry point for the console application.
     !
+    !  COMPILE1: gfortran -c LinearSystems.f90
+    !  COMPILE: gfortran LinearSystems.o GyrationTensorPolymers.f90 -o gyration -L//lib -llapack -lblas -cpp
+    !  RUN: ./gyration
+    !  PLOT: gnuplot plot.gp
     !****************************************************************************
 
     program GyrationTensorPolymers
     use LinearSystems
+#if defined(__INTEL_COMPILER__)
     use LAPACK95
+#endif
     implicit none
 
 
@@ -56,8 +62,11 @@
     
     einheit =  reshape(valI, [3,3])
     ! Speichern der Namen der .dat Dateien in FILES.txt
+#if defined(__GFORTRAN__)
+    call system('ls -l | grep *.dat > FILES.txt') !Linux
+#else
     call system('DIR *.DAT /B > FILES.txt') !Windows
-    !call system('ls -l *.dat./inFiles > FILES.txt') !Linux
+#endif
 
     open(unit= 11,file="FILES.txt",action="read")
     open(unit =17, file="Average-chain.txt", action="write")
@@ -87,14 +96,14 @@
 
         ! Test
         print*, filename, LEN(trim(filename)), stiffness, ' ' , form, ' ', num
-
+        
         ! Aufrufen einer der .dat Dateien
         open(unit=12, file=filename, action="read")
         
         open(unit=13, file=trim("data" // filename(1:length-3) // "txt"),action="write")
         ! Loop über die verschiedenen Konfigurationen, die in einer Datei gespeichert sind
         do i = 1,conf
-            
+            schwerpunkt = 0d0
             do j = 1, num
                 read(12, *) position(j,1), position(j,2), position(j,3)
                 schwerpunkt = schwerpunkt + position(j,1:3)
@@ -104,6 +113,12 @@
             schwerpunkt = schwerpunkt / dble(num)
             
             rg_pos = 0d0
+            sxx = 0d0
+            syy = 0d0
+            szz = 0d0
+            sxy = 0d0
+            sxz = 0d0
+            syz = 0d0
             do j = 1, num
                 sxx = sxx + (position(j,1) - schwerpunkt(1))**2
                 syy = syy + (position(j,2) - schwerpunkt(2))**2
@@ -115,12 +130,7 @@
 
             end do
             
-            !sxx = sxx / num
-            !syy = syy / num
-            !szz = szz / num
-            !sxy = sxy / num
-            !sxz = sxz / num
-            !syz = syz/ num
+            
             
             rg_pos = sqrt(rg_pos / dble(num))
             
@@ -142,14 +152,16 @@
                 k = k + 1
                 call QRFaktorisierung3d(gyrationTensor, Q,R)
                 gyrationTensor = matmul(R,Q)
-                if (abs(gyrationTensor(2,1)) < 1d-10 .and. abs(gyrationTensor(3,1)) < 1d-10 .and. abs(gyrationTensor(3,2)) < 1d-10) then
+                if (abs(gyrationTensor(2,1)) < 1d-10 .and. &
+                    abs(gyrationTensor(3,1)) < 1d-10 .and. abs(gyrationTensor(3,2)) < 1d-10) then
                     exit
                 end if
             end do
             do k= 1, 3
                 eigenwert(k) = gyrationTensor(k,k)
             end do
-           write(15, '(A,1x,A,1x,I3, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x)') form, stiffness, i, eigenwert(1), eigenwert(2), eigenwert(3), wr(1), wr(2), wr(3)
+           write(15, '(A,1x,A,1x,I3, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x,F16.6, 1x)') &
+               form, stiffness, i, eigenwert(1), eigenwert(2), eigenwert(3), wr(1), wr(2), wr(3)
             !Sortieren der Eigenwerte
             eigenwert_sort(1) = MINVAL(wr)
             wr(MINLOC(wr)) = MAXVAL(wr) + 1d0
@@ -166,11 +178,13 @@
             
             asphericity = eigenwert_sort(3) - 1d0/2d0 * (eigenwert_sort(1) + eigenwert_sort(2))
             
-            prolateness = ((3 * eigenwert_sort(1) - rg)*(3*eigenwert_sort(2) - rg)*( 3*eigenwert_sort(3) - rg))/ rg**3
+            prolateness = ((3 * eigenwert_sort(1) - rg)*(3*eigenwert_sort(2) - rg)*&
+                ( 3*eigenwert_sort(3) - rg))/ rg**3
             
             rg = sqrt(rg)
             
-            write(13,'(I3,1x, F16.6, 1x,F16.6, 1x,F16.6,1x, F16.6, 1x,F16.6,1x, F16.6,1x, F16.6)') i, rg,rg_pos, asphericity, prolateness, eigenwert_sort(1), eigenwert_sort(2),eigenwert_sort(3) 
+            write(13,'(I3,1x, F16.6, 1x,F16.6, 1x,F16.6,1x, F16.6, 1x,F16.6,1x, F16.6,1x, F16.6)') i, rg,rg_pos, &
+                asphericity, prolateness, eigenwert_sort(1), eigenwert_sort(2),eigenwert_sort(3) 
         end do
         close(12)
         close(13)
@@ -189,16 +203,19 @@
             prolateness_av=prolateness_av+prolateness
         END DO
         CLOSE(33)
-        rg_av=rg_av/dble(num)
-        rg_pos_av=rg_pos_av/dble(num)
-        asphericity_av=asphericity_av/dble(num)
-        prolateness_av=prolateness_av/dble(num)
+        rg_av=rg_av/dble(conf)
+        rg_pos_av=rg_pos_av/dble(conf)
+        asphericity_av=asphericity_av/dble(conf)
+        prolateness_av=prolateness_av/dble(conf)
         if (form == "chain") then
-            write(17, '(A, 1x, F16.6, 1x, F16.6, 1x, F16.6, 1x, F16.6)') stiffness, rg_av, rg_pos_av, asphericity_av, prolateness_av    
+            write(17, '(A, 1x, F16.6, 1x, F16.6, 1x, F16.6, 1x, F16.6)') stiffness, rg_av, rg_pos_av,&
+                asphericity_av, prolateness_av    
         else if(form == "ring") then
-            write(18, '(A, 1x, F16.6, 1x, F16.6, 1x, F16.6, 1x, F16.6)') stiffness, rg_av, rg_pos_av, asphericity_av, prolateness_av    
+            write(18, '(A, 1x, F16.6, 1x, F16.6, 1x, F16.6, 1x, F16.6)') stiffness, rg_av, rg_pos_av, &
+                asphericity_av, prolateness_av    
         else if(form=="star") then
-            write(19, '(A, 1x, F16.6, 1x, F16.6, 1x, F16.6, 1x, F16.6)') stiffness, rg_av, rg_pos_av, asphericity_av, prolateness_av     
+            write(19, '(A, 1x, F16.6, 1x, F16.6, 1x, F16.6, 1x, F16.6)') stiffness, rg_av, rg_pos_av, &
+                asphericity_av, prolateness_av     
         else
             print*, "Unexpected Form!"
             exit
@@ -214,6 +231,8 @@
     close(19)
 
   
+    call system('gnuplot plot.gp') 
+    
 
     end program GyrationTensorPolymers
 
