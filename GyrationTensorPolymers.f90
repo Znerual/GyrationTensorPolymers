@@ -60,7 +60,9 @@
     !call system('ls -l *.dat./inFiles > FILES.txt') !Linux
 
     open(unit= 11,file="FILES.txt",action="read")
-    open(unit =14, file="Average.txt", action="write")
+    open(unit =17, file="Average-chain.txt", action="write")
+    open(unit =18, file="Average-ring.txt", action="write")
+    open(unit =19, file="Average-star.txt", action="write")
     open(unit=15, file="Eigenvalues.txt", action="write")
     do
         read(11,*, iostat=stat) filename
@@ -100,6 +102,7 @@
             
             
             schwerpunkt = schwerpunkt / dble(num)
+            
             rg_pos = 0d0
             do j = 1, num
                 sxx = sxx + (position(j,1) - schwerpunkt(1))**2
@@ -109,7 +112,16 @@
                 sxz = sxz + (position(j,1) - schwerpunkt(1))*(position(j,3) - schwerpunkt(3))
                 syz = syz + (position(j,2) - schwerpunkt(2))*(position(j,3) - schwerpunkt(3))
                 rg_pos = rg_pos +  sum((position(j, 1:3) - schwerpunkt(1:3))**2)
+
             end do
+            
+            !sxx = sxx / num
+            !syy = syy / num
+            !szz = szz / num
+            !sxy = sxy / num
+            !sxz = sxz / num
+            !syz = syz/ num
+            
             rg_pos = sqrt(rg_pos / dble(num))
             
             gyrationTensor(1,1:3) = [sxx, sxy, sxz]
@@ -147,8 +159,9 @@
             
             
             wr = 0d0
-            
-           
+            rg =0d0
+            asphericity = 0d0
+            prolateness = 0d0
             rg = sum(eigenwert_sort)
             
             asphericity = eigenwert_sort(3) - 1d0/2d0 * (eigenwert_sort(1) + eigenwert_sort(2))
@@ -180,75 +193,27 @@
         rg_pos_av=rg_pos_av/dble(num)
         asphericity_av=asphericity_av/dble(num)
         prolateness_av=prolateness_av/dble(num)
-        write(14, '(A, 1x, A, 1x, F16.6, 1x, F16.6, 1x, F16.6, 1x, F16.6)') form, stiffness, rg_av, rg_pos_av, asphericity_av, prolateness_av
+        if (form == "chain") then
+            write(17, '(A, 1x, F16.6, 1x, F16.6, 1x, F16.6, 1x, F16.6)') stiffness, rg_av, rg_pos_av, asphericity_av, prolateness_av    
+        else if(form == "ring") then
+            write(18, '(A, 1x, F16.6, 1x, F16.6, 1x, F16.6, 1x, F16.6)') stiffness, rg_av, rg_pos_av, asphericity_av, prolateness_av    
+        else if(form=="star") then
+            write(19, '(A, 1x, F16.6, 1x, F16.6, 1x, F16.6, 1x, F16.6)') stiffness, rg_av, rg_pos_av, asphericity_av, prolateness_av     
+        else
+            print*, "Unexpected Form!"
+            exit
+        end if
         
         
     end do    
     close(11)
     close(14)
     close(15)
+    close(17)
+    close(18)
+    close(19)
 
-
-    !! Store the data for each configuration j
-    !!OPEN(33,file='data.dat',status='unknown')
-    !!
-    !!!DO j=1,m
-    !!
-    !!    ! Compute the center of mass of the polymer
-    !!
-    !!    ! Compute the gyration tensor A
-    !!
-    !!    ! Computer the eigenvalues of the gyration tensor
-    !!
-    !!    ! ... with home-made QR-algorithm
-    !!    ! Compute  u1
-    !!    ! Compute  H1
-    !!    ! Compute the product H1A
-    !!
-    !!    ! Compute  u2
-    !!    ! Compute  H2
-    !!    ! Compute the product H2A
-    !!
-    !!    ! Store the three eigenvalues
-    !!
-    !!    ! ... with LAPACK
-    !!
-    !!    ! Store the three eigenvalues
-    !!
-    !!    ! Compute the gyration radius, the asphericity and the prolateness
-    !!    ! from the invariants of the gyration tensor
-    !!
-    !!    ! Compute the gyration radius from the monomers positions directly
-    !!
-    !!!END DO
-    !!
-    !!CLOSE(30)
-    !!CLOSE(33)
-    !!
-    !!! Average over the m independent configurations
-    !!OPEN(33,file='data.dat',status='old')
-    !!rg_av=0.d0
-    !!rg_pos_av=0.d0
-    !!asphericity_av=0.d0
-    !!prolateness_av=0.d0
-    !!DO j=1,m
-    !!    READ(33,*)i,rg,rg_pos,asphericity,prolateness,lambda1,lambda2,lambda3
-    !!    rg_av=rg_av+rg
-    !!    rg_pos_av=rg_pos_av+rg_pos
-    !!    asphericity_av=asphericity_av+asphericity
-    !!    prolateness_av=prolateness_av+prolateness
-    !!END DO
-    !!CLOSE(33)
-    !!rg_av=rg_av/dble(m)
-    !!rg_pos_av=rg_pos_av/dble(m)
-    !!asphericity_av=asphericity_av/dble(m)
-    !!prolateness_av=prolateness_av/dble(m)
-    !!
-    !!! Save the averaged data
-    !!OPEN(30,file='data-averaged.dat',status='unknown', access='append')
-    !!WRITE(30,*)ncstring,sqrt(rg_av),sqrt(rg_pos_av),asphericity_av/rg_av,prolateness_av
-    !!CLOSE(30)
-    !!print *, 'Hello World'
+  
 
     end program GyrationTensorPolymers
 

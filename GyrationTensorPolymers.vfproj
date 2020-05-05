@@ -26,7 +26,9 @@
 	<Files>
 		<Filter Name="Header Files" Filter="fi;fd"/>
 		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
-		<File RelativePath=".\Average.txt"/>
+		<File RelativePath=".\Average-chain.txt"/>
+		<File RelativePath=".\Average-ring.txt"/>
+		<File RelativePath=".\Average-star.txt"/>
 		<File RelativePath=".\conf-chain-00.dat"/>
 		<File RelativePath=".\conf-chain-05.dat"/>
 		<File RelativePath=".\conf-chain-10.dat"/>
@@ -50,9 +52,11 @@
 		<File RelativePath=".\dataconf-ring-50.txt"/>
 		<File RelativePath=".\dataconf-star-00.txt"/>
 		<File RelativePath=".\Eigenvalues.txt"/>
-		<File RelativePath=".\FILES.txt"/></Filter>
+		<File RelativePath=".\FILES.txt"/>
+		<File RelativePath=".\Polymers_Gyration.pdf"/></Filter>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<File RelativePath=".\GyrationTensorPolymers.f90"/>
-		<File RelativePath="..\Poison Equation\LinearSystems.f90"/></Filter>
+		<File RelativePath="..\Poison Equation\LinearSystems.f90"/>
+		<File RelativePath=".\plot.gp"/></Filter>
 		<File RelativePath=".\ReadMe.txt"/></Files>
 	<Globals/></VisualStudioProject>
